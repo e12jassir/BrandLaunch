@@ -1,9 +1,9 @@
 import sqlite3
 
-from flask import Flask, render_template, request
+from flask import Flask, abort, render_template, request
 
 from config import Config
-from database.db import close_connection, init_db, insert_lead
+from database.db import close_connection, get_lead, init_db, insert_lead, list_leads
 
 
 FORM_FIELDS = ("name", "email", "phone", "service_interest", "message")
@@ -40,6 +40,10 @@ def render_landing(
         ),
         status_code,
     )
+
+
+def render_admin_inbox(*, status_code: int = 200):
+    return render_template("admin.html", leads=list_leads()), status_code
 
 
 def create_app(config_overrides: dict | None = None) -> Flask:
@@ -87,7 +91,14 @@ def create_app(config_overrides: dict | None = None) -> Flask:
 
     @app.get("/admin")
     def admin():
-        return render_template("admin.html")
+        return render_admin_inbox()
+
+    @app.get("/admin/leads/<int:lead_id>")
+    def admin_lead_detail(lead_id: int):
+        lead = get_lead(lead_id)
+        if lead is None:
+            abort(404)
+        return render_template("admin_lead_detail.html", lead=lead)
 
     @app.cli.command("init-db")
     def init_db_command():

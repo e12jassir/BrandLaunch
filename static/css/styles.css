@@ -276,6 +276,95 @@ h3 {
     background: rgba(255, 255, 255, 0.03);
 }
 
+.admin-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.8fr);
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.admin-scope-note {
+    position: relative;
+    z-index: 1;
+    border-left: 1px solid var(--line);
+    padding-left: 1.5rem;
+}
+
+.admin-inbox {
+    margin-top: 1.25rem;
+}
+
+.lead-list,
+.lead-detail-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.lead-card,
+.lead-message-card {
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.lead-card-header,
+.lead-meta,
+.lead-detail-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.lead-card-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+}
+
+.lead-card-label {
+    margin: 0 0 0.5rem;
+    color: var(--signal);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.lead-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lead-meta dt,
+.lead-detail-grid dt {
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.lead-meta dd,
+.lead-detail-grid dd {
+    margin: 0.3rem 0 0;
+    color: var(--text);
+}
+
+.lead-excerpt,
+.admin-empty-state p,
+.lead-message-card p {
+    margin-bottom: 0;
+}
+
+.admin-empty-state {
+    border: 1px dashed var(--line);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.lead-detail-card {
+    margin-top: 1.25rem;
+}
+
 .grid-section span {
     color: var(--signal);
     font-weight: 900;
@@ -440,6 +529,7 @@ blockquote {
 
 @media (max-width: 900px) {
     .hero-layout,
+    .admin-hero,
     .split-section .outcomes-list,
     .process-steps,
     .proof-grid,
@@ -453,6 +543,18 @@ blockquote {
         border-top: 1px solid var(--line);
         padding-left: 0;
         padding-top: 1.5rem;
+    }
+
+    .admin-scope-note {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding-left: 0;
+        padding-top: 1.5rem;
+    }
+
+    .lead-meta,
+    .lead-card-header {
+        grid-template-columns: 1fr;
     }
 }
 

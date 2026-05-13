@@ -6,10 +6,12 @@ content management.
 
 ## Current Scope
 
-This repository currently ships a public lead-capture foundation slice: a runnable
-Flask app, safe local configuration, SQLite schema initialization, shared Jinja
-templates, a public premium landing for Nova Studio Digital, same-page fallback
-lead capture on `/`, static assets, tests, linting, and contributor setup documentation.
+This repository currently ships a public lead-capture foundation slice plus a
+read-only internal lead review surface: a runnable Flask app, safe local
+configuration, SQLite schema initialization, shared Jinja templates, a public
+premium landing for Nova Studio Digital, same-page fallback lead capture on `/`,
+an internal lead inbox on `/admin`, lead detail pages on `/admin/leads/<id>`,
+static assets, tests, linting, and contributor setup documentation.
 
 Admin auth, dashboard, CRUD, CSV export, analytics, email, deployment, spam
 protection, and broader lead operations are deferred.
@@ -60,7 +62,8 @@ testimonials, and site settings. It is safe to run more than once.
 Available routes:
 
 - `/` — public premium landing for Nova Studio Digital with a WhatsApp-first CTA and secondary same-page contact form
-- `/admin` — admin placeholder explaining deferred auth, dashboard, and CRUD
+- `/admin` — read-only internal lead inbox with summary metadata and short message excerpts
+- `/admin/leads/<id>` — read-only lead detail page for a stored submission
 
 ## Test
 
@@ -80,7 +83,7 @@ Available routes:
 - WhatsApp-first primary CTA
 - Secondary same-page `POST /` fallback stores leads in SQLite after validation
 - Run `.venv/bin/flask --app app init-db` before accepting submissions
-- No admin auth or dashboard implementation
+- Read-only admin review only; no admin auth or dashboard implementation
 - No CSV export, analytics, or email automation
 - No spam protection or export workflows
 

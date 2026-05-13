@@ -23,15 +23,18 @@ def test_public_home_uses_nova_studio_digital_metadata_and_shared_landmarks(clie
     assert body.count("<h1") == 1
 
 
-def test_admin_placeholder_names_deferred_workflows(client):
+def test_admin_inbox_keeps_shared_layout_and_read_only_boundaries(client):
     response = client.get("/admin")
 
     body = response.get_data(as_text=True)
 
     assert response.status_code == 200
+    assert "Lead inbox" in body
+    assert "No leads yet" in body
     assert "auth" in body
-    assert "dashboard" in body
-    assert "CRUD" in body
+    assert "search" in body
+    assert "export" in body
+    assert "edit" in body.lower()
     assert "deferred" in body
 
 
@@ -79,7 +82,7 @@ def test_pages_use_shared_layout_and_assets(client):
         assert "app.js" in body
 
 
-def test_small_viewport_static_contract_keeps_placeholder_pages_usable():
+def test_small_viewport_static_contract_keeps_foundation_pages_usable():
     css = Path("static/css/styles.css").read_text(encoding="utf-8")
     app = create_app({"TESTING": True})
     client = app.test_client()
@@ -95,7 +98,7 @@ def test_small_viewport_static_contract_keeps_placeholder_pages_usable():
     assert "padding: 1.5rem;" in css
 
 
-def test_public_landing_stays_presentation_only_while_admin_remains_deferred(tmp_path):
+def test_public_landing_stays_presentation_only_while_admin_is_read_only(tmp_path):
     app = create_app({
         "TESTING": True,
         "DATABASE_PATH": str(tmp_path / "brandlaunch-invalid.sqlite"),
@@ -129,9 +132,11 @@ def test_public_landing_stays_presentation_only_while_admin_remains_deferred(tmp
     assert "message is required" in body
     assert 'value="+54 11 5555 5555"' in body
     assert 'value="Landing page"' in body
+    assert "lead inbox" in admin_body
+    assert "no leads yet" in admin_body
     assert "auth" in admin_body
-    assert "dashboard" in admin_body
-    assert "crud" in admin_body
+    assert "search" in admin_body
+    assert "export" in admin_body
     assert "deferred" in admin_body
 
 
@@ -241,8 +246,9 @@ def test_readme_documents_foundation_workflow_and_limits():
         ".venv/bin/flask --app app run",
         ".venv/bin/pytest",
         ".venv/bin/ruff check .",
+        "/admin/leads/<id>",
         "admin auth",
-        "CRUD",
+        "read-only",
         "CSV export",
         "analytics",
         "email",

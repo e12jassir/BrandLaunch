@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}BrandLaunch — Lead Detail{% endblock %}
+
+{% block content %}
+<section class="hero-panel admin-hero" aria-labelledby="lead-detail-title">
+    <div>
+        <p class="eyebrow">Lead detail</p>
+        <h1 id="lead-detail-title">{{ lead.name }}</h1>
+        <p class="hero-copy">Full read-only submission detail for internal review. Edit and delete controls remain deferred.</p>
+    </div>
+    <div class="admin-scope-note">
+        <p class="hero-note-label">Back to inbox</p>
+        <a class="secondary-action" href="{{ url_for('admin') }}">Return to /admin</a>
+    </div>
+</section>
+
+<section class="story-section lead-detail-card" aria-labelledby="lead-detail-fields-title">
+    <div class="section-heading">
+        <p class="eyebrow">Submission</p>
+        <h2 id="lead-detail-fields-title">Lead detail</h2>
+    </div>
+
+    <dl class="lead-detail-grid">
+        <div>
+            <dt>Email</dt>
+            <dd>{{ lead.email }}</dd>
+        </div>
+        <div>
+            <dt>Phone</dt>
+            <dd>{{ lead.phone or "—" }}</dd>
+        </div>
+        <div>
+            <dt>Service interest</dt>
+            <dd>{{ lead.service_interest or "General inquiry" }}</dd>
+        </div>
+        <div>
+            <dt>Status</dt>
+            <dd>{{ lead.status }}</dd>
+        </div>
+        <div>
+            <dt>Received</dt>
+            <dd>{{ lead.created_at }}</dd>
+        </div>
+    </dl>
+
+    <div class="lead-message-card">
+        <p class="lead-card-label">Message</p>
+        <p>{{ lead.message or "No message provided." }}</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>BrandLaunch internal lead detail preview. Editing, deleting, reassignment, and workflow actions remain deferred.</p>
+{% endblock %}

@@ -1,14 +1,69 @@
 {% extends "base.html" %}
 
-{% block title %}BrandLaunch — Admin Placeholder{% endblock %}
+{% block title %}BrandLaunch — Lead Inbox{% endblock %}
 
 {% block content %}
-<section class="hero-panel compact" aria-labelledby="admin-title">
-    <p class="eyebrow">Admin foundation</p>
-    <h1 id="admin-title">Admin surface reserved for the next implementation phase.</h1>
-    <p class="hero-copy">
-        BrandLaunch admin auth, dashboard metrics, and CRUD workflows are deferred.
-        This placeholder protects scope while proving the route and shared layout.
-    </p>
+<section class="hero-panel admin-hero" aria-labelledby="admin-title">
+    <div>
+        <p class="eyebrow">Internal preview</p>
+        <h1 id="admin-title">Lead inbox</h1>
+        <p class="hero-copy">
+            Review captured leads without expanding into CRM workflows. Auth, search,
+            filtering, export, metrics, and edit actions stay deferred in this internal preview.
+        </p>
+    </div>
+    <div class="admin-scope-note" aria-label="Admin scope note">
+        <p class="hero-note-label">Scope now</p>
+        <p>Read-only inbox and detail views for stored leads.</p>
+    </div>
 </section>
+
+<section class="story-section admin-inbox" aria-labelledby="admin-inbox-title">
+    <div class="section-heading">
+        <p class="eyebrow">Inbox</p>
+        <h2 id="admin-inbox-title">Stored leads ordered newest first</h2>
+    </div>
+
+    {% if leads %}
+    <div class="lead-list" role="list">
+        {% for lead in leads %}
+        <article class="lead-card" role="listitem">
+            <div class="lead-card-header">
+                <div>
+                    <p class="lead-card-label">{{ lead.service_interest or "General inquiry" }}</p>
+                    <h3>{{ lead.name }}</h3>
+                </div>
+                <a class="secondary-action" href="{{ url_for('admin_lead_detail', lead_id=lead.id) }}">Open detail</a>
+            </div>
+            <dl class="lead-meta">
+                <div>
+                    <dt>Email</dt>
+                    <dd>{{ lead.email }}</dd>
+                </div>
+                <div>
+                    <dt>Status</dt>
+                    <dd>{{ lead.status }}</dd>
+                </div>
+                <div>
+                    <dt>Received</dt>
+                    <dd>{{ lead.created_at }}</dd>
+                </div>
+            </dl>
+            {% if lead.message_excerpt %}
+            <p class="lead-excerpt">{{ lead.message_excerpt }}</p>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="admin-empty-state">
+        <p class="proof-label">No leads yet</p>
+        <p>The inbox will populate here after the public landing captures its first valid lead.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>BrandLaunch internal lead inbox preview. Admin auth, search, filtering, export, metrics, edit actions, and broader CRM workflows remain deferred.</p>
 {% endblock %}

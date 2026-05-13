@@ -53,3 +53,48 @@ def insert_lead(
     )
     connection.commit()
     return int(cursor.lastrowid)
+
+
+def list_leads() -> list[sqlite3.Row]:
+    connection = get_connection()
+    try:
+        return connection.execute(
+            """
+            SELECT
+                id,
+                name,
+                email,
+                phone,
+                service_interest,
+                status,
+                created_at,
+                CASE
+                    WHEN length(trim(coalesce(message, ''))) > 80
+                        THEN substr(trim(coalesce(message, '')), 1, 80) || '…'
+                    ELSE trim(coalesce(message, ''))
+                END AS message_excerpt
+            FROM leads
+            ORDER BY created_at DESC, id DESC
+            """
+        ).fetchall()
+    except sqlite3.OperationalError as exc:
+        if "no such table: leads" not in str(exc).lower():
+            raise
+        return []
+
+
+def get_lead(lead_id: int) -> sqlite3.Row | None:
+    connection = get_connection()
+    try:
+        return connection.execute(
+            """
+            SELECT id, name, email, phone, service_interest, message, status, created_at
+            FROM leads
+            WHERE id = ?
+            """,
+            (lead_id,),
+        ).fetchone()
+    except sqlite3.OperationalError as exc:
+        if "no such table: leads" not in str(exc).lower():
+            raise
+        return None
