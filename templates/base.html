@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{% block meta_description %}BrandLaunch premium MVP foundation for business landing pages and admin workflows.{% endblock %}">
+    <title>{% block title %}BrandLaunch{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+        <a class="brand-mark" href="{{ url_for('landing') }}">BrandLaunch</a>
+        <nav aria-label="Primary navigation" class="site-nav">
+            <a href="{{ url_for('landing') }}">Landing</a>
+            <a href="{{ url_for('admin') }}">Admin preview</a>
+        </nav>
+    </header>
+    <main id="main-content" class="page-shell" tabindex="-1">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        {% block footer %}
+        <p>BrandLaunch foundation with a public Nova Studio Digital demo and deferred admin workflows.</p>
+        {% endblock %}
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Studio Digital — WhatsApp-first websites for service brands{% endblock %}
+
+{% block meta_description %}Nova Studio Digital builds high-touch websites and launch assets for service brands that need a polished presence and a fast WhatsApp-first conversion path.{% endblock %}
+
+{% block content %}
+<section id="hero" class="hero-panel hero-layout" aria-labelledby="hero-title">
+    <div class="hero-copy-block">
+        <p class="eyebrow">Nova Studio Digital · WhatsApp-first launch partner</p>
+        <h1 id="hero-title">Premium websites and launch assets for service brands that need traction fast.</h1>
+        <p class="hero-copy">
+            We shape the message, design the experience, and turn your homepage into a clear
+            next step people can act on without hunting for how to contact you.
+        </p>
+        <div class="hero-actions">
+            <a class="primary-action" href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital">Start on WhatsApp</a>
+            <a class="secondary-action" href="#services">See what Nova Studio Digital builds</a>
+        </div>
+    </div>
+    <aside class="hero-note" aria-label="Offer snapshot">
+        <p class="hero-note-label">Built for</p>
+        <ul>
+            <li>Studios, consultants, and local premium services</li>
+            <li>Offers that need a sharper online presence before paid traffic</li>
+            <li>Teams that want one direct conversion path instead of clutter</li>
+        </ul>
+    </aside>
+</section>
+
+<section id="services" class="story-section grid-section" aria-labelledby="services-title">
+    <div class="section-heading">
+        <p class="eyebrow">Services</p>
+        <h2 id="services-title">What Nova Studio Digital delivers in the first sprint</h2>
+    </div>
+    <article>
+        <span>01</span>
+        <h3>Positioning and page structure</h3>
+        <p>Clear headlines, tighter messaging, and a page flow that gets visitors to act faster.</p>
+    </article>
+    <article>
+        <span>02</span>
+        <h3>Premium visual direction</h3>
+        <p>Editorial layouts, stronger hierarchy, and a look that feels worth your price point.</p>
+    </article>
+    <article>
+        <span>03</span>
+        <h3>Launch-ready contact path</h3>
+        <p>WhatsApp-first conversion design so interested visitors know exactly what to do next.</p>
+    </article>
+</section>
+
+<section id="outcomes" class="story-section split-section" aria-labelledby="outcomes-title">
+    <div class="section-heading">
+        <p class="eyebrow">Benefits</p>
+        <h2 id="outcomes-title">Why this feels different from a generic template shop</h2>
+    </div>
+    <div class="outcomes-list">
+        <article>
+            <h3>Visitors understand the offer quickly</h3>
+            <p>Your page says what you do, who it is for, and why it matters inside the first screen.</p>
+        </article>
+        <article>
+            <h3>The CTA stops competing with everything else</h3>
+            <p>One primary WhatsApp action reduces hesitation and keeps the next step obvious.</p>
+        </article>
+        <article>
+            <h3>Your brand looks considered before the sales call</h3>
+            <p>Premium design signals trust before you ever pitch the work live.</p>
+        </article>
+    </div>
+</section>
+
+<section id="process" class="story-section process-section" aria-labelledby="process-title">
+    <div class="section-heading">
+        <p class="eyebrow">Process</p>
+        <h2 id="process-title">A simple flow that keeps the project moving</h2>
+    </div>
+    <ol class="process-steps">
+        <li><strong>Audit the offer.</strong> We find the message gaps, friction points, and fastest wins.</li>
+        <li><strong>Shape the landing.</strong> Copy, structure, and visual system come together around one CTA.</li>
+        <li><strong>Launch the page.</strong> You leave with a clearer brand surface and a direct contact path.</li>
+    </ol>
+</section>
+
+<section id="testimonials" class="story-section proof-section" aria-labelledby="proof-title">
+    <div class="section-heading">
+        <p class="eyebrow">Proof</p>
+        <h2 id="proof-title">Illustrative proof, labeled honestly</h2>
+    </div>
+    <div class="proof-grid">
+        <article>
+            <p class="proof-label">Demo testimonial</p>
+            <blockquote>“The page finally sounded like our studio and gave people one obvious way to reach us.”</blockquote>
+            <p class="proof-source">Illustrative example · interior design studio</p>
+        </article>
+        <article>
+            <p class="proof-label">Demo result</p>
+            <blockquote>“Our visitors stopped bouncing between links because the WhatsApp CTA was impossible to miss.”</blockquote>
+            <p class="proof-source">Illustrative example · local consulting brand</p>
+        </article>
+    </div>
+</section>
+
+<section id="contact" class="story-section contact-section" role="region" aria-labelledby="contact-title">
+    <div>
+        <p class="eyebrow">Contact</p>
+        <h2 id="contact-title">Want the page to feel premium before you buy more traffic?</h2>
+        <p class="hero-copy contact-copy">
+            Start in WhatsApp and we will map the first landing direction together. No forms, no backend workflow,
+            no fake urgency — just the fastest way to talk through the next version of your brand presence.
+        </p>
+    </div>
+    <div class="contact-actions">
+        <a class="primary-action" href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital">Message Nova Studio Digital</a>
+        <a class="secondary-action" href="{{ url_for('admin') }}">View deferred admin preview</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>Nova Studio Digital demo landing in BrandLaunch. Admin auth, dashboard, CRUD, analytics, email, and persistence remain deferred.</p>
+{% endblock %}
