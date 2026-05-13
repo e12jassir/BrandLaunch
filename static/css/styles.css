@@ -169,7 +169,8 @@ a:focus-visible {
 .section-heading,
 .outcomes-list,
 .process-steps,
-.contact-actions {
+.contact-actions,
+.contact-form-card {
     position: relative;
     z-index: 1;
 }
@@ -325,6 +326,113 @@ blockquote {
     margin-top: 1rem;
 }
 
+.contact-primary {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.contact-form-card {
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.contact-form-copy {
+    margin: 0.75rem 0 0;
+}
+
+.form-status {
+    min-height: 1.5rem;
+    margin-top: 1rem;
+}
+
+.success-panel {
+    border: 1px solid rgba(88, 225, 208, 0.35);
+    border-radius: 1rem;
+    padding: 1rem;
+    background: rgba(88, 225, 208, 0.08);
+}
+
+.success-title {
+    color: var(--text);
+    font-weight: 800;
+}
+
+.success-link {
+    display: inline-flex;
+    margin-top: 0.75rem;
+}
+
+.secondary-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.field-group {
+    display: grid;
+    gap: 0.45rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.field-group-full {
+    grid-column: 1 / -1;
+}
+
+.field-group input,
+.field-group textarea {
+    width: 100%;
+    border: 1px solid rgba(244, 234, 215, 0.16);
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    background: rgba(7, 17, 26, 0.9);
+    color: var(--text);
+    font: inherit;
+}
+
+.field-group textarea {
+    resize: vertical;
+}
+
+.field-group input:focus-visible,
+.field-group textarea:focus-visible,
+.secondary-submit:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.field-error {
+    color: #ffb5a8;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.form-error {
+    margin: 0;
+}
+
+.secondary-submit {
+    justify-self: start;
+    border: 1px solid rgba(88, 225, 208, 0.3);
+    border-radius: 999px;
+    padding: 0.9rem 1.2rem;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.secondary-submit:hover {
+    border-color: var(--signal);
+    color: var(--signal);
+}
+
 .hero-note ul,
 .process-steps {
     margin-top: 0;
@@ -335,7 +443,8 @@ blockquote {
     .split-section .outcomes-list,
     .process-steps,
     .proof-grid,
-    .contact-section {
+    .contact-section,
+    .secondary-form {
         grid-template-columns: 1fr;
     }
 

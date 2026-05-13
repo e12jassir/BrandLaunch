@@ -103,21 +103,74 @@
 </section>
 
 <section id="contact" class="story-section contact-section" role="region" aria-labelledby="contact-title">
-    <div>
-        <p class="eyebrow">Contact</p>
-        <h2 id="contact-title">Want the page to feel premium before you buy more traffic?</h2>
-        <p class="hero-copy contact-copy">
-            Start in WhatsApp and we will map the first landing direction together. No forms, no backend workflow,
-            no fake urgency — just the fastest way to talk through the next version of your brand presence.
-        </p>
+    <div class="contact-primary">
+        <div>
+            <p class="eyebrow">Contact</p>
+            <h2 id="contact-title">Want the page to feel premium before you buy more traffic?</h2>
+            <p class="hero-copy contact-copy">
+                Start in WhatsApp if you want the fastest route. If you would rather send details first,
+                use the short form as a secondary option and we will reply with the next best step.
+            </p>
+        </div>
+        <div class="contact-actions">
+            <a class="primary-action" href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital">Message Nova Studio Digital</a>
+            <a class="secondary-action" href="{{ url_for('admin') }}">View deferred admin preview</a>
+        </div>
     </div>
-    <div class="contact-actions">
-        <a class="primary-action" href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital">Message Nova Studio Digital</a>
-        <a class="secondary-action" href="{{ url_for('admin') }}">View deferred admin preview</a>
+    <div class="contact-form-card">
+        <p class="eyebrow">Secondary path</p>
+        <h3>Prefer sending project details first?</h3>
+        <p class="contact-form-copy">This stays intentionally secondary to WhatsApp and keeps the brief lightweight.</p>
+
+        <div class="form-status" aria-live="polite">
+            {% if submission_state == "success" %}
+            <div class="success-panel">
+                <p class="success-title">Thanks — your project details are in.</p>
+                <p>We will review the brief and reply with the best next step. If you want to move faster, you can still start on WhatsApp.</p>
+                <a class="secondary-action success-link" href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital">Continue in WhatsApp</a>
+            </div>
+            {% elif database_error %}
+            <p class="field-error form-error">{{ database_error }}</p>
+            {% elif submission_state == "error" %}
+            <p class="field-error form-error">Please fix the required fields and try again.</p>
+            {% endif %}
+        </div>
+
+        <form class="secondary-form" action="{{ url_for('landing') }}" method="post" novalidate>
+            <label class="field-group" for="name">
+                <span>Name</span>
+                <input id="name" name="name" type="text" value="{{ form_values.name }}" aria-describedby="name-error" {% if form_errors.name %}aria-invalid="true"{% endif %}>
+                {% if form_errors.name %}<span id="name-error" class="field-error">{{ form_errors.name }}</span>{% endif %}
+            </label>
+
+            <label class="field-group" for="email">
+                <span>Email</span>
+                <input id="email" name="email" type="email" value="{{ form_values.email }}" aria-describedby="email-error" {% if form_errors.email %}aria-invalid="true"{% endif %}>
+                {% if form_errors.email %}<span id="email-error" class="field-error">{{ form_errors.email }}</span>{% endif %}
+            </label>
+
+            <label class="field-group" for="phone">
+                <span>Phone or WhatsApp</span>
+                <input id="phone" name="phone" type="text" value="{{ form_values.phone }}">
+            </label>
+
+            <label class="field-group" for="service_interest">
+                <span>What do you need?</span>
+                <input id="service_interest" name="service_interest" type="text" value="{{ form_values.service_interest }}">
+            </label>
+
+            <label class="field-group field-group-full" for="message">
+                <span>Project details</span>
+                <textarea id="message" name="message" rows="5" aria-describedby="message-error" {% if form_errors.message %}aria-invalid="true"{% endif %}>{{ form_values.message }}</textarea>
+                {% if form_errors.message %}<span id="message-error" class="field-error">{{ form_errors.message }}</span>{% endif %}
+            </label>
+
+            <button class="secondary-submit" type="submit">Send project details</button>
+        </form>
     </div>
 </section>
 {% endblock %}
 
 {% block footer %}
-<p>Nova Studio Digital demo landing in BrandLaunch. Admin auth, dashboard, CRUD, analytics, email, and persistence remain deferred.</p>
+<p>Nova Studio Digital demo landing in BrandLaunch. Admin auth, dashboard, CRUD, analytics, email, export, and spam protection remain deferred.</p>
 {% endblock %}

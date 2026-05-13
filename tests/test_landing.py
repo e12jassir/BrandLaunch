@@ -36,8 +36,15 @@ def test_landing_keeps_whatsapp_primary_and_proof_honest(client):
     assert body.count('class="primary-action"') == 2
     assert "Demo testimonial" in body
     assert "demo result" in body.lower()
-    assert "action=" not in body
-    assert 'method="post"' not in body.lower()
+    assert 'action="/"' in body
+    assert 'method="post"' in body.lower()
+    assert 'class="secondary-form"' in body
+    assert 'name="name"' in body
+    assert 'name="email"' in body
+    assert 'name="phone"' in body
+    assert 'name="service_interest"' in body
+    assert 'name="message"' in body
+    assert 'aria-live="polite"' in body
     assert "Preview admin scope" not in body
 
 

@@ -95,17 +95,103 @@ def test_small_viewport_static_contract_keeps_placeholder_pages_usable():
     assert "padding: 1.5rem;" in css
 
 
-def test_public_landing_stays_presentation_only_while_admin_remains_deferred(client):
-    landing_body = client.get("/").get_data(as_text=True).lower()
+def test_public_landing_stays_presentation_only_while_admin_remains_deferred(tmp_path):
+    app = create_app({
+        "TESTING": True,
+        "DATABASE_PATH": str(tmp_path / "brandlaunch-invalid.sqlite"),
+    })
+
+    with app.app_context():
+        init_db(app)
+
+    client = app.test_client()
+    response = client.post(
+        "/",
+        data={
+            "name": "",
+            "email": "",
+            "phone": "+54 11 5555 5555",
+            "service_interest": "Landing page",
+            "message": "",
+        },
+    )
+    body = response.get_data(as_text=True)
+
+    with sqlite3.connect(app.config["DATABASE_PATH"]) as connection:
+        lead_count = connection.execute("SELECT COUNT(*) FROM leads").fetchone()[0]
+
     admin_body = client.get("/admin").get_data(as_text=True).lower()
 
-    assert "real client results" not in landing_body
-    assert "action=" not in landing_body
-    assert 'method="post"' not in landing_body
+    assert response.status_code == 200
+    assert lead_count == 0
+    assert "name is required" in body
+    assert "email is required" in body
+    assert "message is required" in body
+    assert 'value="+54 11 5555 5555"' in body
+    assert 'value="Landing page"' in body
     assert "auth" in admin_body
     assert "dashboard" in admin_body
     assert "crud" in admin_body
     assert "deferred" in admin_body
+
+
+def test_valid_post_persists_lead_and_renders_thank_you_state(tmp_path):
+    database_path = tmp_path / "brandlaunch-leads.sqlite"
+    app = create_app({"TESTING": True, "DATABASE_PATH": str(database_path)})
+
+    with app.app_context():
+        init_db(app)
+
+    client = app.test_client()
+    response = client.post(
+        "/",
+        data={
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "phone": "+54 11 4444 4444",
+            "service_interest": "Website refresh",
+            "message": "I want a premium landing that still pushes WhatsApp first.",
+        },
+    )
+    body = response.get_data(as_text=True)
+
+    with sqlite3.connect(database_path) as connection:
+        lead = connection.execute(
+            "SELECT name, email, phone, service_interest, message, status, created_at FROM leads"
+        ).fetchone()
+
+    assert response.status_code == 200
+    assert "Thanks — your project details are in." in body
+    assert 'href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital"' in body
+    assert lead[:6] == (
+        "Ada Lovelace",
+        "ada@example.com",
+        "+54 11 4444 4444",
+        "Website refresh",
+        "I want a premium landing that still pushes WhatsApp first.",
+        "nuevo",
+    )
+    assert lead[6] is not None
+
+
+def test_post_without_initialized_database_fails_clearly(tmp_path):
+    database_path = tmp_path / "missing-init.sqlite"
+    app = create_app({"TESTING": True, "DATABASE_PATH": str(database_path)})
+    client = app.test_client()
+
+    response = client.post(
+        "/",
+        data={
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "message": "Need help.",
+        },
+    )
+
+    assert response.status_code == 500
+    assert "Initialize the database with flask init-db before accepting leads." in response.get_data(
+        as_text=True
+    )
 
 
 def test_progressive_script_stays_inert_without_needed_enhancements():

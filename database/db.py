@@ -34,3 +34,22 @@ def init_db(app: Flask | None = None) -> None:
 
     connection = get_connection()
     connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+
+def insert_lead(
+    name: str,
+    email: str,
+    message: str,
+    phone: str | None = None,
+    service_interest: str | None = None,
+) -> int:
+    connection = get_connection()
+    cursor = connection.execute(
+        """
+        INSERT INTO leads (name, email, phone, service_interest, message)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (name, email, phone, service_interest, message),
+    )
+    connection.commit()
+    return int(cursor.lastrowid)

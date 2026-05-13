@@ -12,3 +12,6 @@ build/
 *.sqlite
 *.db
 .atl/
+.agents/
+AGENT.md
+skills-lock.json
