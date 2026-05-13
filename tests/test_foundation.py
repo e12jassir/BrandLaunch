@@ -127,9 +127,9 @@ def test_public_landing_stays_presentation_only_while_admin_is_read_only(tmp_pat
 
     assert response.status_code == 200
     assert lead_count == 0
-    assert "name is required" in body
-    assert "email is required" in body
-    assert "message is required" in body
+    assert "El nombre es obligatorio" in body
+    assert "El email es obligatorio" in body
+    assert "Contanos brevemente que necesitas" in body
     assert 'value="+54 11 5555 5555"' in body
     assert 'value="Landing page"' in body
     assert "lead inbox" in admin_body
@@ -166,7 +166,7 @@ def test_valid_post_persists_lead_and_renders_thank_you_state(tmp_path):
         ).fetchone()
 
     assert response.status_code == 200
-    assert "Thanks — your project details are in." in body
+    assert "Listo — recibimos tu brief." in body
     assert 'href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital"' in body
     assert lead[:6] == (
         "Ada Lovelace",
@@ -194,7 +194,7 @@ def test_post_without_initialized_database_fails_clearly(tmp_path):
     )
 
     assert response.status_code == 500
-    assert "Initialize the database with flask init-db before accepting leads." in response.get_data(
+    assert "Inicializa la base con flask init-db antes de recibir leads." in response.get_data(
         as_text=True
     )
 
@@ -204,6 +204,13 @@ def test_progressive_script_stays_inert_without_needed_enhancements():
 
     assert "js-ready" not in script
     assert script.strip() in {"", "// No landing enhancement needed."}
+
+
+def test_readme_remains_untouched_by_landing_refinement_slice():
+    readme = Path("README.md").read_text(encoding="utf-8")
+
+    assert "Start in WhatsApp and we will map the first landing direction together." not in readme
+    assert "Sitios premium para vender mejor por WhatsApp." not in readme
 
 
 def test_documented_venv_flask_init_db_cli_creates_schema(tmp_path):

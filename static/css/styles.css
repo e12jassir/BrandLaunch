@@ -144,13 +144,13 @@ a:focus-visible {
 
 .hero-panel {
     overflow: hidden;
-    padding: clamp(2rem, 7vw, 5rem);
+    padding: clamp(1.75rem, 5vw, 4rem);
 }
 
 .hero-layout {
     display: grid;
     grid-template-columns: minmax(0, 1.8fr) minmax(18rem, 0.95fr);
-    gap: 2rem;
+    gap: 1.5rem;
     align-items: end;
 }
 
@@ -209,7 +209,7 @@ h1 {
 
 h2 {
     margin: 0;
-    font-size: clamp(2rem, 4vw, 3.3rem);
+    font-size: clamp(1.8rem, 4vw, 3rem);
     letter-spacing: -0.05em;
 }
 
@@ -234,7 +234,7 @@ h3 {
     flex-wrap: wrap;
     gap: 1rem;
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 
 .primary-action {
@@ -255,7 +255,7 @@ h3 {
 
 .story-section {
     margin-top: 1.25rem;
-    padding: clamp(1.5rem, 5vw, 3rem);
+    padding: clamp(1.35rem, 4vw, 2.4rem);
 }
 
 .grid-section {
@@ -272,7 +272,7 @@ h3 {
 .grid-section article,
 .proof-grid article {
     border-radius: 1.5rem;
-    padding: 1.5rem;
+    padding: 1.3rem;
     background: rgba(255, 255, 255, 0.03);
 }
 
@@ -370,18 +370,32 @@ h3 {
     font-weight: 900;
 }
 
-.split-section .outcomes-list {
+.outcomes-process-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
     gap: 1rem;
     margin-top: 1.5rem;
 }
 
+.outcomes-process-panel {
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    padding: 1.35rem;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.outcomes-list,
 .process-steps {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0 0;
+    gap: 0.9rem;
+    margin: 1rem 0 0;
+}
+
+.outcomes-list {
+    padding-left: 1.15rem;
+}
+
+.process-steps {
     padding-left: 1.25rem;
 }
 
@@ -389,7 +403,15 @@ h3 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1.1rem;
+}
+
+.proof-section .section-heading {
+    max-width: 42rem;
+}
+
+.proof-section .proof-grid article {
+    background: rgba(255, 255, 255, 0.02);
 }
 
 blockquote {
@@ -405,10 +427,8 @@ blockquote {
 }
 
 .contact-section {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.8fr);
-    gap: 1.5rem;
-    align-items: end;
+    display: block;
+    background: linear-gradient(180deg, rgba(11, 21, 31, 0.88), rgba(9, 16, 24, 0.82));
 }
 
 .contact-copy {
@@ -416,16 +436,63 @@ blockquote {
 }
 
 .contact-primary {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+}
+
+.contact-primary > div:first-child {
+    max-width: 46rem;
+}
+
+.contact-support-copy {
+    max-width: 34rem;
+    margin: 0.9rem 0 0;
+    color: var(--text-soft);
+}
+
+.contact-next-steps {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.contact-next-steps li {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.45fr) minmax(0, 1fr);
+    gap: 0.75rem;
+    border-top: 1px solid var(--line);
+    padding-top: 0.75rem;
+}
+
+.contact-next-steps strong {
+    color: var(--text);
+}
+
+.contact-next-steps span {
+    color: var(--text-soft);
 }
 
 .contact-form-card {
     border: 1px solid var(--line);
     border-radius: 1.5rem;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.contact-form-section {
+    background: linear-gradient(180deg, rgba(9, 16, 24, 0.72), rgba(7, 14, 21, 0.88));
+}
+
+.contact-form-section .contact-form-card {
+    width: 100%;
+    max-width: none;
+}
+
+.contact-section .contact-actions {
+    margin-top: 0;
 }
 
 .contact-form-copy {
@@ -530,7 +597,7 @@ blockquote {
 @media (max-width: 900px) {
     .hero-layout,
     .admin-hero,
-    .split-section .outcomes-list,
+    .outcomes-process-grid,
     .process-steps,
     .proof-grid,
     .contact-section,
@@ -556,6 +623,65 @@ blockquote {
     .lead-card-header {
         grid-template-columns: 1fr;
     }
+
+    .page-shell {
+        padding: 1.5rem 0 3rem;
+    }
+
+    .hero-panel {
+        padding: 1.5rem;
+    }
+
+    .story-section {
+        padding: 1.2rem;
+    }
+
+    .grid-section,
+    .outcomes-process-grid,
+    .proof-grid,
+    .secondary-form {
+        gap: 0.85rem;
+    }
+
+    .grid-section article,
+    .proof-grid article,
+    .outcomes-process-panel,
+    .contact-form-card,
+    .lead-card,
+    .lead-message-card,
+    .admin-empty-state {
+        padding: 1.05rem;
+        border-radius: 1.2rem;
+    }
+
+    .contact-primary,
+    .contact-next-steps,
+    .contact-actions,
+    .outcomes-list,
+    .process-steps {
+        gap: 0.7rem;
+    }
+
+    .contact-copy,
+    .contact-support-copy,
+    .contact-form-copy,
+    .proof-source {
+        margin-top: 0.7rem;
+    }
+
+    .contact-next-steps {
+        margin-top: 1rem;
+    }
+
+    .contact-next-steps li {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+        padding-top: 0.65rem;
+    }
+
+    blockquote {
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 760px) {
@@ -568,7 +694,7 @@ blockquote {
     .story-section,
     .grid-section article,
     .proof-grid article {
-        padding: 1.5rem;
+        padding: 1.15rem;
     }
 
     .grid-section {
