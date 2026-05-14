@@ -15,6 +15,9 @@
     <div class="admin-scope-note" aria-label="Admin scope note">
         <p class="hero-note-label">Scope now</p>
         <p>Read-only inbox and detail views for stored leads.</p>
+        <form method="post" action="{{ url_for('admin_logout') }}">
+            <button type="submit" class="secondary-action">Logout</button>
+        </form>
     </div>
 </section>
 
@@ -65,5 +68,5 @@
 {% endblock %}
 
 {% block footer %}
-<p>BrandLaunch internal lead inbox preview. Admin auth, search, filtering, export, metrics, edit actions, and broader CRM workflows remain deferred.</p>
+<p>BrandLaunch internal lead inbox preview. Admin auth now gates access while search, filtering, export, metrics, edit actions, and broader CRM workflows remain deferred.</p>
 {% endblock %}

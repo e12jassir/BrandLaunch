@@ -7,14 +7,15 @@ content management.
 ## Current Scope
 
 This repository currently ships a public lead-capture foundation slice plus a
-read-only internal lead review surface: a runnable Flask app, safe local
-configuration, SQLite schema initialization, shared Jinja templates, a public
-premium landing for Nova Studio Digital, same-page fallback lead capture on `/`,
-an internal lead inbox on `/admin`, lead detail pages on `/admin/leads/<id>`,
-static assets, tests, linting, and contributor setup documentation.
+single-admin protected internal lead review surface: a runnable Flask app, safe
+local configuration, SQLite schema initialization, shared Jinja templates, a
+public premium landing for Nova Studio Digital, same-page fallback lead capture
+on `/`, an admin auth entry on `/admin/login`, a protected internal lead inbox
+on `/admin`, lead detail pages on `/admin/leads/<id>`, static assets, tests,
+linting, and contributor setup documentation.
 
-Admin auth, dashboard, CRUD, CSV export, analytics, email, deployment, spam
-protection, and broader lead operations are deferred.
+Dashboard, multi-user auth, CRUD, CSV export, analytics, email, deployment,
+spam protection, and broader lead operations are deferred.
 
 ## Stack
 
@@ -40,9 +41,12 @@ cp .env.example .env
 - `FLASK_ENV`
 - `SECRET_KEY`
 - `DATABASE_PATH`
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
 
 Secrets are optional for local development because the app uses safe defaults
-when no `.env` file exists.
+when no `.env` file exists, but `/admin/login` only becomes usable after both
+admin auth credentials are configured.
 
 ## Database Initialization
 
@@ -62,8 +66,9 @@ testimonials, and site settings. It is safe to run more than once.
 Available routes:
 
 - `/` — public premium landing for Nova Studio Digital with a WhatsApp-first CTA and secondary same-page contact form
-- `/admin` — read-only internal lead inbox with summary metadata and short message excerpts
-- `/admin/leads/<id>` — read-only lead detail page for a stored submission
+- `/admin/login` — public auth surface for the single admin
+- `/admin` — protected read-only internal lead inbox with summary metadata and short message excerpts
+- `/admin/leads/<id>` — protected read-only lead detail page for a stored submission
 
 ## Test
 
@@ -83,7 +88,10 @@ Available routes:
 - WhatsApp-first primary CTA
 - Secondary same-page `POST /` fallback stores leads in SQLite after validation
 - Run `.venv/bin/flask --app app init-db` before accepting submissions
-- Read-only admin review only; no admin auth or dashboard implementation
+- Single-admin auth protects the read-only admin review surface
+- Missing credentials keep `/admin/login` in an explicit setup-needed state
+- Logout uses `POST /admin/logout` and clears the current admin session
+- No multi-user roles, password recovery, or audit logging
 - No CSV export, analytics, or email automation
 - No spam protection or export workflows
 

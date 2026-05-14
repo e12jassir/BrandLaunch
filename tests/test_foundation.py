@@ -23,31 +23,79 @@ def test_public_home_uses_nova_studio_digital_metadata_and_shared_landmarks(clie
     assert body.count("<h1") == 1
 
 
-def test_admin_inbox_keeps_shared_layout_and_read_only_boundaries(client):
-    response = client.get("/admin")
+def test_admin_login_keeps_shared_layout_and_auth_boundaries(tmp_path):
+    app = create_app(
+        {
+            "TESTING": True,
+            "DATABASE_PATH": str(tmp_path / "brandlaunch-foundation.sqlite"),
+            "ADMIN_USERNAME": "nova-admin",
+            "ADMIN_PASSWORD": "super-secret",
+        }
+    )
+    response = app.test_client().get("/admin/login")
 
     body = response.get_data(as_text=True)
 
     assert response.status_code == 200
-    assert "Lead inbox" in body
-    assert "No leads yet" in body
-    assert "auth" in body
-    assert "search" in body
-    assert "export" in body
-    assert "edit" in body.lower()
-    assert "deferred" in body
+    assert "Acceso administrativo" in body
+    assert "Ingreso interno para revisar contactos y seguimiento comercial." in body
+    assert "Operación interna" in body
+    assert "Solo la cuenta administradora configurada puede entrar." in body
+    assert "Usuario administrador" in body
+    assert "Clave de acceso" in body
+    assert "Entrar al panel interno" in body
+    assert "Acceso interno de BrandLaunch para revisión administrativa." in body
+    assert "Authenticate before reviewing leads" not in body
+    assert "Username" not in body
+    assert "Password" not in body
+    assert "lead inbox" not in body.lower()
 
 
 def test_missing_env_uses_safe_development_defaults(monkeypatch):
     monkeypatch.delenv("FLASK_ENV", raising=False)
     monkeypatch.delenv("SECRET_KEY", raising=False)
     monkeypatch.delenv("DATABASE_PATH", raising=False)
+    monkeypatch.delenv("ADMIN_USERNAME", raising=False)
+    monkeypatch.delenv("ADMIN_PASSWORD", raising=False)
 
-    app = create_app({"TESTING": True})
+    app = create_app(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "dev-secret-key-change-me",
+            "DATABASE_PATH": "brandlaunch.sqlite",
+            "ADMIN_USERNAME": None,
+            "ADMIN_PASSWORD": None,
+        }
+    )
 
     assert app.config["ENV_NAME"] == "development"
     assert app.config["SECRET_KEY"] == "dev-secret-key-change-me"
     assert app.config["DATABASE_PATH"] == "brandlaunch.sqlite"
+    assert app.config["ADMIN_USERNAME"] is None
+    assert app.config["ADMIN_PASSWORD"] is None
+
+
+def test_env_admin_credentials_override_defaults(monkeypatch):
+    monkeypatch.setenv("ADMIN_USERNAME", "nova-admin")
+    monkeypatch.setenv("ADMIN_PASSWORD", "super-secret")
+
+    app = create_app({"TESTING": True})
+
+    assert app.config["ADMIN_USERNAME"] == "nova-admin"
+    assert app.config["ADMIN_PASSWORD"] == "super-secret"
+
+
+def test_admin_login_route_is_available_from_the_public_side(client):
+    response = client.get("/admin/login")
+
+    assert response.status_code == 200
+
+
+def test_admin_route_requires_login_when_no_admin_session_exists(client):
+    response = client.get("/admin")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/admin/login")
 
 
 def test_database_initialization_is_repeatable(tmp_path):
@@ -72,7 +120,7 @@ def test_database_initialization_is_repeatable(tmp_path):
 
 
 def test_pages_use_shared_layout_and_assets(client):
-    for path in ("/", "/admin"):
+    for path in ("/", "/admin/login"):
         body = client.get(path).get_data(as_text=True)
         assert '<meta name="viewport"' in body
         assert 'aria-label="Primary navigation"' in body
@@ -84,10 +132,16 @@ def test_pages_use_shared_layout_and_assets(client):
 
 def test_small_viewport_static_contract_keeps_foundation_pages_usable():
     css = Path("static/css/styles.css").read_text(encoding="utf-8")
-    app = create_app({"TESTING": True})
+    app = create_app(
+        {
+            "TESTING": True,
+            "ADMIN_USERNAME": None,
+            "ADMIN_PASSWORD": None,
+        }
+    )
     client = app.test_client()
 
-    for path in ("/", "/admin"):
+    for path in ("/", "/admin/login"):
         body = client.get(path).get_data(as_text=True)
         assert '<meta name="viewport" content="width=device-width, initial-scale=1"' in body
 
@@ -96,9 +150,21 @@ def test_small_viewport_static_contract_keeps_foundation_pages_usable():
     assert "grid-template-columns: 1fr;" in css
     assert "overflow-wrap: anywhere;" in css
     assert "padding: 1.5rem;" in css
+    admin_body = client.get("/admin/login").get_data(as_text=True)
+    assert "admin-login-shell" in admin_body
+    assert "admin-login-card" in admin_body
+    assert "admin-login-status" in admin_body
+    assert ".admin-login-shell" in css
+    assert ".admin-login-card" in css
+    assert ".admin-login-form" in css
+    assert ".admin-login-status" in css
+    assert ".admin-login-status--pending" in css
+    assert ".admin-login-status--error" in css
+    assert "min-height: calc(100vh - 12rem);" in css
+    assert "width: min(100%, 32rem);" in css
 
 
-def test_public_landing_stays_presentation_only_while_admin_is_read_only(tmp_path):
+def test_public_landing_stays_presentation_only_while_admin_requires_login(tmp_path):
     app = create_app({
         "TESTING": True,
         "DATABASE_PATH": str(tmp_path / "brandlaunch-invalid.sqlite"),
@@ -123,7 +189,7 @@ def test_public_landing_stays_presentation_only_while_admin_is_read_only(tmp_pat
     with sqlite3.connect(app.config["DATABASE_PATH"]) as connection:
         lead_count = connection.execute("SELECT COUNT(*) FROM leads").fetchone()[0]
 
-    admin_body = client.get("/admin").get_data(as_text=True).lower()
+    admin_response = client.get("/admin")
 
     assert response.status_code == 200
     assert lead_count == 0
@@ -132,12 +198,8 @@ def test_public_landing_stays_presentation_only_while_admin_is_read_only(tmp_pat
     assert "Contanos brevemente que necesitas" in body
     assert 'value="+54 11 5555 5555"' in body
     assert 'value="Landing page"' in body
-    assert "lead inbox" in admin_body
-    assert "no leads yet" in admin_body
-    assert "auth" in admin_body
-    assert "search" in admin_body
-    assert "export" in admin_body
-    assert "deferred" in admin_body
+    assert admin_response.status_code == 302
+    assert admin_response.headers["Location"].endswith("/admin/login")
 
 
 def test_valid_post_persists_lead_and_renders_thank_you_state(tmp_path):
@@ -253,6 +315,7 @@ def test_readme_documents_foundation_workflow_and_limits():
         ".venv/bin/flask --app app run",
         ".venv/bin/pytest",
         ".venv/bin/ruff check .",
+        "/admin/login",
         "/admin/leads/<id>",
         "admin auth",
         "read-only",

@@ -1,6 +1,15 @@
 import sqlite3
 
-from flask import Flask, abort, render_template, request
+from flask import (
+    Flask,
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from config import Config
 from database.db import close_connection, get_lead, init_db, insert_lead, list_leads
@@ -44,6 +53,41 @@ def render_landing(
 
 def render_admin_inbox(*, status_code: int = 200):
     return render_template("admin.html", leads=list_leads()), status_code
+
+
+def admin_credentials_configured(app: Flask) -> bool:
+    return bool(app.config.get("ADMIN_USERNAME") and app.config.get("ADMIN_PASSWORD"))
+
+
+def is_admin_authenticated() -> bool:
+    return session.get("is_admin_authenticated") is True
+
+
+def redirect_to_admin_login():
+    return redirect(url_for("admin_login"))
+
+
+def require_admin_session():
+    if not is_admin_authenticated():
+        return redirect_to_admin_login()
+    return None
+
+
+def render_admin_login(*, error_message: str | None = None, status_code: int = 200):
+    missing_config_message = None
+    credentials_ready = admin_credentials_configured(current_app)
+    if not credentials_ready:
+        missing_config_message = "Falta configurar las credenciales de administrador"
+
+    return (
+        render_template(
+            "admin_login.html",
+            credentials_ready=credentials_ready,
+            error_message=error_message,
+            missing_config_message=missing_config_message,
+        ),
+        status_code,
+    )
 
 
 def create_app(config_overrides: dict | None = None) -> Flask:
@@ -91,10 +135,39 @@ def create_app(config_overrides: dict | None = None) -> Flask:
 
     @app.get("/admin")
     def admin():
+        if redirect_response := require_admin_session():
+            return redirect_response
         return render_admin_inbox()
+
+    @app.route("/admin/login", methods=["GET", "POST"])
+    def admin_login():
+        if request.method == "GET":
+            return render_admin_login()
+
+        if not admin_credentials_configured(app):
+            return render_admin_login()
+
+        username = str(request.form.get("username", "")).strip()
+        password = str(request.form.get("password", ""))
+        if (
+            username != app.config["ADMIN_USERNAME"]
+            or password != app.config["ADMIN_PASSWORD"]
+        ):
+            return render_admin_login(error_message="Credenciales invalidas")
+
+        session.clear()
+        session["is_admin_authenticated"] = True
+        return redirect(url_for("admin"))
+
+    @app.post("/admin/logout")
+    def admin_logout():
+        session.clear()
+        return redirect_to_admin_login()
 
     @app.get("/admin/leads/<int:lead_id>")
     def admin_lead_detail(lead_id: int):
+        if redirect_response := require_admin_session():
+            return redirect_response
         lead = get_lead(lead_id)
         if lead is None:
             abort(404)

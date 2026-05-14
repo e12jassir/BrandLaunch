@@ -12,6 +12,9 @@
     <div class="admin-scope-note">
         <p class="hero-note-label">Back to inbox</p>
         <a class="secondary-action" href="{{ url_for('admin') }}">Return to /admin</a>
+        <form method="post" action="{{ url_for('admin_logout') }}">
+            <button type="submit" class="secondary-action">Logout</button>
+        </form>
     </div>
 </section>
 
@@ -52,5 +55,5 @@
 {% endblock %}
 
 {% block footer %}
-<p>BrandLaunch internal lead detail preview. Editing, deleting, reassignment, and workflow actions remain deferred.</p>
+<p>BrandLaunch internal lead detail preview. Authenticated review is available while editing, deleting, reassignment, and workflow actions remain deferred.</p>
 {% endblock %}

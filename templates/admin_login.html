@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}BrandLaunch — Acceso administrativo{% endblock %}
+
+{% block content %}
+<section class="admin-login-shell" aria-labelledby="admin-login-title">
+    <div class="admin-login-card">
+        <div class="admin-login-intro">
+            <p class="eyebrow">Operación interna</p>
+            <h1 id="admin-login-title">Acceso administrativo</h1>
+            <p class="admin-login-copy">Ingreso interno para revisar contactos y seguimiento comercial.</p>
+            <p class="admin-login-meta">Solo la cuenta administradora configurada puede entrar.</p>
+        </div>
+
+        {% if missing_config_message %}
+        <div class="admin-login-status admin-login-status--pending" role="status">
+            <p class="proof-label">Configuración pendiente</p>
+            <p>{{ missing_config_message }}</p>
+            <p>Definí las variables ADMIN_USERNAME y ADMIN_PASSWORD para habilitar este acceso interno.</p>
+        </div>
+        {% elif error_message %}
+        <div class="admin-login-status admin-login-status--error" role="alert">
+            <p class="proof-label">Acceso rechazado</p>
+            <p>Credenciales inválidas. Verificá el usuario y la clave para continuar.</p>
+        </div>
+        {% endif %}
+
+        {% if credentials_ready %}
+        <form method="post" class="admin-login-form" aria-label="Admin login form">
+            <label class="field-group">
+                <span>Usuario administrador</span>
+                <input type="text" name="username" autocomplete="username" required>
+            </label>
+            <label class="field-group">
+                <span>Clave de acceso</span>
+                <input type="password" name="password" autocomplete="current-password" required>
+            </label>
+            <button type="submit" class="primary-action">Entrar al panel interno</button>
+        </form>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>Acceso interno de BrandLaunch para revisión administrativa.</p>
+{% endblock %}
