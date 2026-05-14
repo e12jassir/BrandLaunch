@@ -1,41 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}BrandLaunch — Acceso administrativo{% endblock %}
+{% block title %}BrandLaunch — Admin Login{% endblock %}
 
 {% block content %}
 <section class="admin-login-shell" aria-labelledby="admin-login-title">
     <div class="admin-login-card">
         <div class="admin-login-intro">
-            <p class="eyebrow">Operación interna</p>
-            <h1 id="admin-login-title">Acceso administrativo</h1>
-            <p class="admin-login-copy">Ingreso interno para revisar contactos y seguimiento comercial.</p>
-            <p class="admin-login-meta">Solo la cuenta administradora configurada puede entrar.</p>
+            <p class="eyebrow">Internal operations</p>
+            <h1 id="admin-login-title">Admin login</h1>
+            <p class="admin-login-copy">Internal access for reviewing leads and managing follow-up priorities.</p>
+            <p class="admin-login-meta">Only the configured administrator account can sign in.</p>
         </div>
 
         {% if missing_config_message %}
         <div class="admin-login-status admin-login-status--pending" role="status">
-            <p class="proof-label">Configuración pendiente</p>
+            <p class="proof-label">Configuration required</p>
             <p>{{ missing_config_message }}</p>
-            <p>Definí las variables ADMIN_USERNAME y ADMIN_PASSWORD para habilitar este acceso interno.</p>
+            <p>Set the ADMIN_USERNAME and ADMIN_PASSWORD variables to enable this internal access.</p>
         </div>
         {% elif error_message %}
         <div class="admin-login-status admin-login-status--error" role="alert">
-            <p class="proof-label">Acceso rechazado</p>
-            <p>Credenciales inválidas. Verificá el usuario y la clave para continuar.</p>
+            <p class="proof-label">Access denied</p>
+            <p>Invalid credentials. Check the username and password, then try again.</p>
         </div>
         {% endif %}
 
         {% if credentials_ready %}
         <form method="post" class="admin-login-form" aria-label="Admin login form">
             <label class="field-group">
-                <span>Usuario administrador</span>
+                <span>Admin username</span>
                 <input type="text" name="username" autocomplete="username" required>
             </label>
             <label class="field-group">
-                <span>Clave de acceso</span>
+                <span>Password</span>
                 <input type="password" name="password" autocomplete="current-password" required>
             </label>
-            <button type="submit" class="primary-action">Entrar al panel interno</button>
+            <button type="submit" class="primary-action">Sign in to admin</button>
         </form>
         {% endif %}
     </div>
@@ -43,5 +43,5 @@
 {% endblock %}
 
 {% block footer %}
-<p>Acceso interno de BrandLaunch para revisión administrativa.</p>
+<p>BrandLaunch internal access for authenticated admin review.</p>
 {% endblock %}

@@ -34,7 +34,7 @@ def build_admin_client(tmp_path):
     return app.test_client(), database_path
 
 
-def test_admin_inbox_empty_state_and_deferred_scope_copy(tmp_path):
+def test_admin_dashboard_empty_state_and_honest_triage_actions(tmp_path):
     client, _database_path = build_admin_client(tmp_path)
 
     response = client.post(
@@ -45,17 +45,18 @@ def test_admin_inbox_empty_state_and_deferred_scope_copy(tmp_path):
     body = response.get_data(as_text=True)
 
     assert response.status_code == 200
-    assert "Lead inbox" in body
-    assert "No leads yet" in body
-    assert "internal preview" in body.lower()
-    assert "auth" in body.lower()
-    assert "search" in body.lower()
-    assert "filter" in body.lower()
-    assert "export" in body.lower()
-    assert "metrics" in body.lower()
+    assert "Admin overview" in body
+    assert "0" in body
+    assert "No leads captured yet" in body
+    assert 'href="/admin/leads"' in body
+    assert "Open inbox" in body
+    assert "Latest lead unavailable until the first submission lands." in body
+    assert "/admin/leads/" not in body
+    assert "Edit lead" not in body
+    assert "Delete lead" not in body
 
 
-def test_admin_inbox_shows_newest_first_summary_and_short_excerpt(tmp_path):
+def test_admin_dashboard_shows_real_metrics_latest_link_and_recent_preview_order(tmp_path):
     client, database_path = build_admin_client(tmp_path)
     older_id = seed_lead(
         database_path,
@@ -63,7 +64,7 @@ def test_admin_inbox_shows_newest_first_summary_and_short_excerpt(tmp_path):
         email="older@example.com",
         phone="+54 11 4000 0000",
         service_interest="Landing refresh",
-        message="Older message should appear after the two newest entries in the inbox.",
+        message="Older message should appear after the two newest entries in the inbox while still proving the preview does not dump the entire note into the dashboard card.",
         created_at="2026-05-13 10:00:00",
     )
     tied_first_id = seed_lead(
@@ -97,15 +98,24 @@ def test_admin_inbox_shows_newest_first_summary_and_short_excerpt(tmp_path):
     third_index = body.index("Older Lead")
 
     assert response.status_code == 200
+    assert "Admin overview" in body
+    assert "Total leads" in body
+    assert "3" in body
+    assert "New leads" in body
+    assert "Latest submission" in body
     assert first_index < second_index < third_index
     assert "Tie-breaker record should render first because it has the higher id at the same" in body
     assert "Tie-breaker record should render first because it has the higher id at the same timestamp." not in body
+    assert f'href="/admin/leads/{tied_second_id}"' in body
+    assert 'href="/admin/leads"' in body
+    assert "Open latest lead" in body
     assert f'href="/admin/leads/{tied_second_id}"' in body
     assert f'href="/admin/leads/{tied_first_id}"' in body
     assert f'href="/admin/leads/{older_id}"' in body
     assert "Offer repositioning" in body
     assert "Launch system" in body
-    assert "Older message should appear after the two newest entries in the inbox." in body
+    assert "Older message should appear after the two newest entries in the inbox while sti" in body
+    assert "Older message should appear after the two newest entries in the inbox while still proving the preview does not dump the entire note into the dashboard card." not in body
 
 
 def test_admin_lead_detail_renders_full_read_only_record(tmp_path):
@@ -136,9 +146,60 @@ def test_admin_lead_detail_renders_full_read_only_record(tmp_path):
     assert "Website refresh" in body
     assert "Need a premium homepage with a WhatsApp-first path and tighter offer framing." in body
     assert "nuevo" in body
-    assert 'href="/admin"' in body
+    assert 'href="/admin/leads"' in body
     assert "Edit lead" not in body
     assert "Delete lead" not in body
+
+
+def test_admin_leads_inbox_keeps_newest_first_listing_on_new_route(tmp_path):
+    client, database_path = build_admin_client(tmp_path)
+    older_id = seed_lead(
+        database_path,
+        name="Older Lead",
+        email="older@example.com",
+        message="Older message should still render in the inbox route.",
+        created_at="2026-05-13 10:00:00",
+        service_interest="Landing refresh",
+    )
+    newer_id = seed_lead(
+        database_path,
+        name="Newer Lead",
+        email="newer@example.com",
+        message="Newest lead should appear first in the full inbox route.",
+        created_at="2026-05-13 11:00:00",
+        service_interest="Offer repositioning",
+    )
+
+    client.post(
+        "/admin/login",
+        data={"username": "nova-admin", "password": "super-secret"},
+        follow_redirects=True,
+    )
+    response = client.get("/admin/leads")
+    body = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "Lead inbox" in body
+    assert body.index("Newer Lead") < body.index("Older Lead")
+    assert f'href="/admin/leads/{newer_id}"' in body
+    assert f'href="/admin/leads/{older_id}"' in body
+
+
+def test_admin_leads_inbox_shows_empty_state_when_authenticated_but_no_leads(tmp_path):
+    client, _database_path = build_admin_client(tmp_path)
+
+    client.post(
+        "/admin/login",
+        data={"username": "nova-admin", "password": "super-secret"},
+        follow_redirects=True,
+    )
+    response = client.get("/admin/leads")
+    body = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "Lead inbox" in body
+    assert "No leads yet" in body
+    assert "The inbox will populate here after the public landing captures its first valid lead." in body
 
 
 def test_admin_lead_detail_returns_404_for_missing_lead(tmp_path):
@@ -158,6 +219,15 @@ def test_admin_inbox_redirects_to_login_without_session(tmp_path):
     client, _database_path = build_admin_client(tmp_path)
 
     response = client.get("/admin")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/admin/login")
+
+
+def test_admin_leads_redirects_to_login_without_session(tmp_path):
+    client, _database_path = build_admin_client(tmp_path)
+
+    response = client.get("/admin/leads")
 
     assert response.status_code == 302
     assert response.headers["Location"].endswith("/admin/login")
@@ -198,12 +268,12 @@ def test_admin_login_shows_missing_config_message_when_credentials_are_absent(tm
     body = response.get_data(as_text=True)
 
     assert response.status_code == 200
-    assert "Configuración pendiente" in body
-    assert "Falta configurar las credenciales de administrador" in body
-    assert "Definí las variables ADMIN_USERNAME y ADMIN_PASSWORD para habilitar este acceso interno." in body
+    assert "Configuration required" in body
+    assert "Admin credentials have not been configured yet" in body
+    assert "Set the ADMIN_USERNAME and ADMIN_PASSWORD variables to enable this internal access." in body
     assert 'role="status"' in body
     assert 'aria-label="Admin login form"' not in body
-    assert "Entrar al panel interno" not in body
+    assert "Sign in to admin" not in body
 
 
 def test_admin_login_rejects_invalid_credentials_inline(tmp_path):
@@ -216,13 +286,13 @@ def test_admin_login_rejects_invalid_credentials_inline(tmp_path):
     body = response.get_data(as_text=True)
 
     assert response.status_code == 200
-    assert "Acceso rechazado" in body
-    assert "Credenciales inválidas. Verificá el usuario y la clave para continuar." in body
+    assert "Access denied" in body
+    assert "Invalid credentials. Check the username and password, then try again." in body
     assert 'role="alert"' in body
     assert 'aria-label="Admin login form"' in body
     assert 'name="username"' in body
     assert 'name="password"' in body
-    assert "Entrar al panel interno" in body
+    assert "Sign in to admin" in body
 
 
 def test_admin_login_creates_authenticated_session_and_redirects_to_inbox(tmp_path):

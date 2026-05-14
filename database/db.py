@@ -5,6 +5,14 @@ from flask import Flask, current_app, g
 
 
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
+LEADS_ORDER_BY = "ORDER BY created_at DESC, id DESC"
+MESSAGE_EXCERPT_SQL = """
+CASE
+    WHEN length(trim(coalesce(message, ''))) > 80
+        THEN substr(trim(coalesce(message, '')), 1, 80) || '…'
+    ELSE trim(coalesce(message, ''))
+END
+"""
 
 
 def get_database_path(app: Flask | None = None) -> str:
@@ -59,7 +67,7 @@ def list_leads() -> list[sqlite3.Row]:
     connection = get_connection()
     try:
         return connection.execute(
-            """
+            f"""
             SELECT
                 id,
                 name,
@@ -68,14 +76,73 @@ def list_leads() -> list[sqlite3.Row]:
                 service_interest,
                 status,
                 created_at,
-                CASE
-                    WHEN length(trim(coalesce(message, ''))) > 80
-                        THEN substr(trim(coalesce(message, '')), 1, 80) || '…'
-                    ELSE trim(coalesce(message, ''))
-                END AS message_excerpt
+                {MESSAGE_EXCERPT_SQL} AS message_excerpt
             FROM leads
-            ORDER BY created_at DESC, id DESC
+            {LEADS_ORDER_BY}
             """
+        ).fetchall()
+    except sqlite3.OperationalError as exc:
+        if "no such table: leads" not in str(exc).lower():
+            raise
+        return []
+
+
+def get_lead_dashboard_summary() -> dict[str, int | str | None]:
+    connection = get_connection()
+    try:
+        summary = connection.execute(
+            """
+            SELECT
+                COUNT(*) AS total_leads,
+                SUM(CASE WHEN status = 'nuevo' THEN 1 ELSE 0 END) AS new_leads,
+                MAX(created_at) AS latest_created_at
+            FROM leads
+            """
+        ).fetchone()
+        latest_lead = connection.execute(
+            f"""
+            SELECT id
+            FROM leads
+            {LEADS_ORDER_BY}
+            LIMIT 1
+            """
+        ).fetchone()
+    except sqlite3.OperationalError as exc:
+        if "no such table: leads" not in str(exc).lower():
+            raise
+        return {
+            "total_leads": 0,
+            "new_leads": 0,
+            "latest_created_at": None,
+            "latest_lead_id": None,
+        }
+
+    return {
+        "total_leads": int(summary["total_leads"] or 0),
+        "new_leads": int(summary["new_leads"] or 0),
+        "latest_created_at": summary["latest_created_at"],
+        "latest_lead_id": None if latest_lead is None else int(latest_lead["id"]),
+    }
+
+
+def list_recent_leads(limit: int = 3) -> list[sqlite3.Row]:
+    connection = get_connection()
+    try:
+        return connection.execute(
+            f"""
+            SELECT
+                id,
+                name,
+                email,
+                service_interest,
+                status,
+                created_at,
+                {MESSAGE_EXCERPT_SQL} AS message_excerpt
+            FROM leads
+            {LEADS_ORDER_BY}
+            LIMIT ?
+            """,
+            (limit,),
         ).fetchall()
     except sqlite3.OperationalError as exc:
         if "no such table: leads" not in str(exc).lower():

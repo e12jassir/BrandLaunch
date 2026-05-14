@@ -11,9 +11,9 @@
     </div>
     <div class="admin-scope-note">
         <p class="hero-note-label">Back to inbox</p>
-        <a class="secondary-action" href="{{ url_for('admin') }}">Return to /admin</a>
+        <a class="secondary-action" href="{{ url_for('admin_leads') }}">Return to /admin/leads</a>
         <form method="post" action="{{ url_for('admin_logout') }}">
-            <button type="submit" class="secondary-action">Logout</button>
+            <button type="submit" class="secondary-action">Log out</button>
         </form>
     </div>
 </section>

@@ -149,9 +149,9 @@ a:focus-visible {
 
 .hero-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.8fr) minmax(18rem, 0.95fr);
+    grid-template-columns: minmax(0, 2.25fr) minmax(16rem, 0.75fr);
     gap: 1.5rem;
-    align-items: end;
+    align-items: start;
 }
 
 .hero-panel::after {
@@ -205,6 +205,14 @@ h1 {
     line-height: 0.92;
     margin: 0;
     overflow-wrap: anywhere;
+}
+
+.landing-hero-title {
+    max-width: 11em;
+    font-size: clamp(2.75rem, 5.4vw, 4.95rem);
+    letter-spacing: -0.055em;
+    line-height: 1;
+    text-wrap: balance;
 }
 
 h2 {
@@ -292,6 +300,49 @@ h3 {
 
 .admin-inbox {
     margin-top: 1.25rem;
+}
+
+.admin-actions {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.admin-inline-note {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+}
+
+.admin-dashboard-summary {
+    margin-top: 1.25rem;
+}
+
+.admin-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.4rem;
+}
+
+.admin-summary-card {
+    border: 1px solid var(--line);
+    border-radius: 1.4rem;
+    padding: 1.35rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+}
+
+.admin-summary-value {
+    margin: 0;
+    color: var(--text);
+    font-family: "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+}
+
+.admin-summary-value--small {
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    line-height: 1.4;
 }
 
 .admin-login-shell {
@@ -467,6 +518,7 @@ h3 {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
     gap: 1rem;
+    align-items: start;
     margin-top: 1.5rem;
 }
 
@@ -488,6 +540,16 @@ h3 {
     padding-left: 1.15rem;
 }
 
+.outcomes-closing-note {
+    border-top: 1px solid var(--line);
+    margin: 1.25rem 0 0;
+    padding-top: 1rem;
+    color: var(--text);
+    font-family: "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: 1.18rem;
+    line-height: 1.45;
+}
+
 .process-steps {
     padding-left: 1.25rem;
 }
@@ -500,7 +562,11 @@ h3 {
 }
 
 .proof-section .section-heading {
-    max-width: 42rem;
+    max-width: 58rem;
+}
+
+.proof-section h2 {
+    text-wrap: balance;
 }
 
 .proof-section .proof-grid article {
@@ -530,12 +596,13 @@ blockquote {
 
 .contact-primary {
     display: grid;
-    gap: 1.5rem;
+    gap: 0;
     align-content: start;
+    max-width: 58rem;
 }
 
 .contact-primary > div:first-child {
-    max-width: 46rem;
+    max-width: none;
 }
 
 .contact-support-copy {
@@ -585,7 +652,8 @@ blockquote {
 }
 
 .contact-section .contact-actions {
-    margin-top: 0;
+    justify-self: start;
+    margin-top: 1.35rem;
 }
 
 .contact-form-copy {
@@ -694,6 +762,7 @@ blockquote {
     .process-steps,
     .proof-grid,
     .contact-section,
+    .contact-primary,
     .secondary-form {
         grid-template-columns: 1fr;
     }

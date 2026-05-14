@@ -12,7 +12,15 @@ from flask import (
 )
 
 from config import Config
-from database.db import close_connection, get_lead, init_db, insert_lead, list_leads
+from database.db import (
+    close_connection,
+    get_lead,
+    get_lead_dashboard_summary,
+    init_db,
+    insert_lead,
+    list_leads,
+    list_recent_leads,
+)
 
 
 FORM_FIELDS = ("name", "email", "phone", "service_interest", "message")
@@ -51,8 +59,19 @@ def render_landing(
     )
 
 
+def render_admin_dashboard(*, status_code: int = 200):
+    return (
+        render_template(
+            "admin.html",
+            summary=get_lead_dashboard_summary(),
+            recent_leads=list_recent_leads(),
+        ),
+        status_code,
+    )
+
+
 def render_admin_inbox(*, status_code: int = 200):
-    return render_template("admin.html", leads=list_leads()), status_code
+    return render_template("admin_leads.html", leads=list_leads()), status_code
 
 
 def admin_credentials_configured(app: Flask) -> bool:
@@ -77,7 +96,7 @@ def render_admin_login(*, error_message: str | None = None, status_code: int = 2
     missing_config_message = None
     credentials_ready = admin_credentials_configured(current_app)
     if not credentials_ready:
-        missing_config_message = "Falta configurar las credenciales de administrador"
+        missing_config_message = "Admin credentials have not been configured yet"
 
     return (
         render_template(
@@ -137,6 +156,12 @@ def create_app(config_overrides: dict | None = None) -> Flask:
     def admin():
         if redirect_response := require_admin_session():
             return redirect_response
+        return render_admin_dashboard()
+
+    @app.get("/admin/leads")
+    def admin_leads():
+        if redirect_response := require_admin_session():
+            return redirect_response
         return render_admin_inbox()
 
     @app.route("/admin/login", methods=["GET", "POST"])
@@ -153,7 +178,7 @@ def create_app(config_overrides: dict | None = None) -> Flask:
             username != app.config["ADMIN_USERNAME"]
             or password != app.config["ADMIN_PASSWORD"]
         ):
-            return render_admin_login(error_message="Credenciales invalidas")
+            return render_admin_login(error_message="Invalid credentials")
 
         session.clear()
         session["is_admin_authenticated"] = True

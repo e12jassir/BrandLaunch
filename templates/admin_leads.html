@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}BrandLaunch — Lead Inbox{% endblock %}
+
+{% block content %}
+<section class="hero-panel admin-hero" aria-labelledby="admin-title">
+    <div>
+        <p class="eyebrow">Inbox</p>
+        <h1 id="admin-title">Lead inbox</h1>
+        <p class="hero-copy">
+            Review stored leads newest first without expanding this slice into search, export,
+            filters, editing, or CRM workflow controls.
+        </p>
+    </div>
+    <div class="admin-scope-note" aria-label="Admin scope note">
+        <p class="hero-note-label">Navigation</p>
+        <div class="admin-actions">
+            <a class="secondary-action" href="{{ url_for('admin') }}">Return to overview</a>
+        </div>
+        <form method="post" action="{{ url_for('admin_logout') }}">
+            <button type="submit" class="secondary-action">Log out</button>
+        </form>
+    </div>
+</section>
+
+<section class="story-section admin-inbox" aria-labelledby="admin-inbox-title">
+    <div class="section-heading">
+        <p class="eyebrow">Stored leads</p>
+        <h2 id="admin-inbox-title">Stored leads ordered newest first</h2>
+    </div>
+
+    {% if leads %}
+    <div class="lead-list" role="list">
+        {% for lead in leads %}
+        <article class="lead-card" role="listitem">
+            <div class="lead-card-header">
+                <div>
+                    <p class="lead-card-label">{{ lead.service_interest or "General inquiry" }}</p>
+                    <h3>{{ lead.name }}</h3>
+                </div>
+                <a class="secondary-action" href="{{ url_for('admin_lead_detail', lead_id=lead.id) }}">Open detail</a>
+            </div>
+            <dl class="lead-meta">
+                <div>
+                    <dt>Email</dt>
+                    <dd>{{ lead.email }}</dd>
+                </div>
+                <div>
+                    <dt>Status</dt>
+                    <dd>{{ lead.status }}</dd>
+                </div>
+                <div>
+                    <dt>Received</dt>
+                    <dd>{{ lead.created_at }}</dd>
+                </div>
+            </dl>
+            {% if lead.message_excerpt %}
+            <p class="lead-excerpt">{{ lead.message_excerpt }}</p>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="admin-empty-state">
+        <p class="proof-label">No leads yet</p>
+        <p>The inbox will populate here after the public landing captures its first valid lead.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>BrandLaunch internal lead inbox preview. Authenticated review is available while search, filtering, export, edit actions, and broader CRM workflows remain deferred.</p>
+{% endblock %}

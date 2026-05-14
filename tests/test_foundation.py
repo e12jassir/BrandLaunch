@@ -12,10 +12,10 @@ def test_public_home_uses_service_business_metadata_and_shared_landmarks(client)
 
     assert response.status_code == 200
     body = response.get_data(as_text=True)
-    assert "Landing premium para negocios de servicios" in body
+    assert "Premium landing pages for service businesses" in body
     assert "real client results" not in body.lower()
-    assert "<title>Landing premium para negocios de servicios" in body
-    assert 'meta name="description" content="Landing premium para negocios de servicios' in body
+    assert "<title>Premium Landing Pages for Service Businesses" in body
+    assert 'meta name="description" content="Premium landing pages for service businesses' in body
     assert 'href="#main-content"' in body
     assert '<header class="site-header"' in body
     assert 'aria-label="Primary navigation"' in body
@@ -37,17 +37,17 @@ def test_admin_login_keeps_shared_layout_and_auth_boundaries(tmp_path):
     body = response.get_data(as_text=True)
 
     assert response.status_code == 200
-    assert "Acceso administrativo" in body
-    assert "Ingreso interno para revisar contactos y seguimiento comercial." in body
-    assert "Operación interna" in body
-    assert "Solo la cuenta administradora configurada puede entrar." in body
-    assert "Usuario administrador" in body
-    assert "Clave de acceso" in body
-    assert "Entrar al panel interno" in body
-    assert "Acceso interno de BrandLaunch para revisión administrativa." in body
+    assert "Admin login" in body
+    assert "Internal access for reviewing leads and managing follow-up priorities." in body
+    assert "Internal operations" in body
+    assert "Only the configured administrator account can sign in." in body
+    assert "Admin username" in body
+    assert "Password" in body
+    assert "Sign in to admin" in body
+    assert "BrandLaunch internal access for authenticated admin review." in body
     assert "Authenticate before reviewing leads" not in body
-    assert "Username" not in body
-    assert "Password" not in body
+    assert "Usuario administrador" not in body
+    assert "Clave de acceso" not in body
     assert "lead inbox" not in body.lower()
 
 
@@ -93,6 +93,13 @@ def test_admin_login_route_is_available_from_the_public_side(client):
 
 def test_admin_route_requires_login_when_no_admin_session_exists(client):
     response = client.get("/admin")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/admin/login")
+
+
+def test_admin_leads_route_requires_login_when_no_admin_session_exists(client):
+    response = client.get("/admin/leads")
 
     assert response.status_code == 302
     assert response.headers["Location"].endswith("/admin/login")
@@ -190,16 +197,28 @@ def test_public_landing_stays_presentation_only_while_admin_requires_login(tmp_p
         lead_count = connection.execute("SELECT COUNT(*) FROM leads").fetchone()[0]
 
     admin_response = client.get("/admin")
+    admin_leads_response = client.get("/admin/leads")
 
     assert response.status_code == 200
     assert lead_count == 0
-    assert "El nombre es obligatorio" in body
-    assert "El email es obligatorio" in body
-    assert "Contanos brevemente que necesitas" in body
+    assert "Name is required" in body
+    assert "Email is required" in body
+    assert "Tell us briefly what you need" in body
     assert 'value="+54 11 5555 5555"' in body
     assert 'value="Landing page"' in body
     assert admin_response.status_code == 302
     assert admin_response.headers["Location"].endswith("/admin/login")
+    assert admin_leads_response.status_code == 302
+    assert admin_leads_response.headers["Location"].endswith("/admin/login")
+
+
+def test_landing_cta_points_to_admin_overview_instead_of_inbox(client):
+    response = client.get("/")
+    body = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert 'href="/admin"' in body
+    assert 'href="/admin/leads"' not in body
 
 
 def test_valid_post_persists_lead_and_renders_thank_you_state(tmp_path):
@@ -228,7 +247,7 @@ def test_valid_post_persists_lead_and_renders_thank_you_state(tmp_path):
         ).fetchone()
 
     assert response.status_code == 200
-    assert "Listo — recibimos tu brief." in body
+    assert "Thanks — we received your brief." in body
     assert 'href="https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital"' in body
     assert lead[:6] == (
         "Ada Lovelace",
@@ -256,7 +275,7 @@ def test_post_without_initialized_database_fails_clearly(tmp_path):
     )
 
     assert response.status_code == 500
-    assert "Inicializa la base con flask init-db antes de recibir leads." in response.get_data(
+    assert "Initialize the database with flask init-db before accepting leads." in response.get_data(
         as_text=True
     )
 
