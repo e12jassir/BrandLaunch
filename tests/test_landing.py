@@ -52,6 +52,10 @@ def test_landing_keeps_whatsapp_primary_and_proof_honest(client):
     assert "Escribir por WhatsApp" in body
     assert body.count('class="secondary-form"') == 1
     assert body.find('Escribir por WhatsApp') < body.find('id="contact-form"')
+    assert body.find('class="proof-section"') < body.find('id="contact"')
+    assert body.find('Resultado demo') < body.find('id="contact"')
+    assert body.find('id="contact"') < body.find('id="contact-form"')
+    assert 'href="#services"' in body
 
 
 def test_landing_exposes_named_contact_region_and_landmark_outline(client):
@@ -64,13 +68,13 @@ def test_landing_exposes_named_contact_region_and_landmark_outline(client):
     )
     assert 'id="contact-form-title"' in body
     assert body.count("<h1") == 1
-    assert '<h1 id="hero-title">Sitios premium para vender mejor por WhatsApp.</h1>' in body
+    assert '<h1 id="hero-title">Tu negocio necesita una presencia online a la altura de lo que vende.</h1>' in body
     assert (
-        "Diseñamos la landing, ordenamos el mensaje y dejamos un siguiente paso claro"
+        "Disenamos una landing clara, elegante y enfocada en conversion"
         in body
     )
     assert (
-        "La idea es simple: entender que necesita tu marca"
+        "La idea es simple: entender que necesita tu negocio"
         in body
     )
     assert "Leemos el contexto" in body

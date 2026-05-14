@@ -7,15 +7,15 @@ from app import create_app
 from database.db import init_db
 
 
-def test_public_home_uses_nova_studio_digital_metadata_and_shared_landmarks(client):
+def test_public_home_uses_service_business_metadata_and_shared_landmarks(client):
     response = client.get("/")
 
     assert response.status_code == 200
     body = response.get_data(as_text=True)
-    assert "Nova Studio Digital" in body
+    assert "Landing premium para negocios de servicios" in body
     assert "real client results" not in body.lower()
-    assert "<title>Nova Studio Digital" in body
-    assert 'meta name="description" content="Nova Studio Digital builds high-touch websites' in body
+    assert "<title>Landing premium para negocios de servicios" in body
+    assert 'meta name="description" content="Landing premium para negocios de servicios' in body
     assert 'href="#main-content"' in body
     assert '<header class="site-header"' in body
     assert 'aria-label="Primary navigation"' in body
