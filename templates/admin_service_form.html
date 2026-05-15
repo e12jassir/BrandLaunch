@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}BrandLaunch — {% if form_mode == "create" %}Create service{% else %}Edit service{% endif %}{% endblock %}
+
+{% block content %}
+<section class="hero-panel service-form-shell" aria-labelledby="service-form-title">
+    <div>
+        <p class="eyebrow">{% if form_mode == "create" %}New service{% else %}Edit service{% endif %}</p>
+        <h1 id="service-form-title">{% if form_mode == "create" %}Create service{% else %}Edit service{% endif %}</h1>
+        <p class="hero-copy">
+            Keep the card compact and commercially useful. Only the existing landing fields are editable in this slice.
+        </p>
+    </div>
+    <div class="admin-scope-note" aria-label="Service form note">
+        <p class="hero-note-label">Fields now</p>
+        <p>Title and description are required. Starting price and icon stay optional, trimmed, and ready for the landing card.</p>
+        <div class="admin-actions">
+            <a class="secondary-action" href="{{ url_for('admin_services') }}">Back to services</a>
+        </div>
+    </div>
+</section>
+
+<section class="story-section service-form-section" aria-labelledby="service-form-fields-title">
+    <div class="section-heading">
+        <p class="eyebrow">Service card</p>
+        <h2 id="service-form-fields-title">{% if form_mode == "create" %}Define the new landing card{% else %}Update the current landing card{% endif %}</h2>
+    </div>
+
+    {% if database_error %}
+    <p class="admin-services-status admin-services-status--error" role="alert">{{ database_error }}</p>
+    {% endif %}
+
+    <form class="secondary-form service-admin-form" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="field-group" for="title">
+            <span>Title</span>
+            <input id="title" name="title" type="text" value="{{ form_values.title }}" aria-describedby="title-error" {% if form_errors.title %}aria-invalid="true"{% endif %}>
+            {% if form_errors.title %}<span id="title-error" class="field-error">{{ form_errors.title }}</span>{% endif %}
+        </label>
+
+        <label class="field-group" for="starting_price">
+            <span>Starting price</span>
+            <input id="starting_price" name="starting_price" type="text" value="{{ form_values.starting_price }}">
+        </label>
+
+        <label class="field-group field-group-full" for="description">
+            <span>Description</span>
+            <textarea id="description" name="description" rows="5" aria-describedby="description-error" {% if form_errors.description %}aria-invalid="true"{% endif %}>{{ form_values.description }}</textarea>
+            {% if form_errors.description %}<span id="description-error" class="field-error">{{ form_errors.description }}</span>{% endif %}
+        </label>
+
+        <label class="field-group" for="icon">
+            <span>Icon</span>
+            <input id="icon" name="icon" type="text" value="{{ form_values.icon }}">
+        </label>
+
+        <button class="secondary-submit" type="submit">{% if form_mode == "create" %}Create service{% else %}Save changes{% endif %}</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>BrandLaunch service form: bounded service-card editing only. Delete, ordering, media, categories, and broader CMS workflows remain deferred.</p>
+{% endblock %}

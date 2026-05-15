@@ -27,6 +27,7 @@
 
         {% if credentials_ready %}
         <form method="post" class="admin-login-form" aria-label="Admin login form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <label class="field-group">
                 <span>Admin username</span>
                 <input type="text" name="username" autocomplete="username" required>

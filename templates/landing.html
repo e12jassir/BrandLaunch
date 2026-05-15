@@ -30,21 +30,17 @@
         <p class="eyebrow">What’s included</p>
         <h2 id="services-title">A commercial landing page designed to present your service more clearly and make contact easier</h2>
     </div>
-    <article>
-        <span>01</span>
-        <h3>Positioning and structure</h3>
-        <p>Clearer headlines, a better-ordered offer, and a page that helps visitors understand what you do faster.</p>
+    {% for service in services %}
+    <article class="service-story-card">
+        <span>{{ "%02d"|format(loop.index) }}</span>
+        <p class="service-story-icon">{{ service.icon or "BL" }}</p>
+        <h3>{{ service.title }}</h3>
+        <p>{{ service.description }}</p>
+        {% if service.starting_price %}
+        <p class="service-story-price">{{ service.starting_price }}</p>
+        {% endif %}
     </article>
-    <article>
-        <span>02</span>
-        <h3>Premium visual direction</h3>
-        <p>Sharper hierarchy, better pacing, and a presence that reflects the real standard of your business.</p>
-    </article>
-    <article>
-        <span>03</span>
-        <h3>Contact flow built to convert</h3>
-        <p>A clear next step so the right person knows exactly how to reach out without friction.</p>
-    </article>
+    {% endfor %}
 </section>
 
 <section id="outcomes-process" class="story-section outcomes-process-section" aria-labelledby="outcomes-process-title">

@@ -505,6 +505,113 @@ h3 {
     background: rgba(255, 255, 255, 0.02);
 }
 
+.admin-services-section,
+.service-form-section {
+    margin-top: 1.25rem;
+}
+
+.service-story-card {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.service-story-icon,
+.service-story-price,
+.service-admin-card__description,
+.service-admin-card__icon,
+.admin-services-status {
+    margin: 0;
+}
+
+.service-story-icon,
+.service-admin-card__icon {
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.service-story-price {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.service-admin-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.4rem;
+}
+
+.service-admin-card {
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    padding: 1.35rem;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.service-admin-card,
+.service-admin-card__header,
+.service-admin-card__actions,
+.service-admin-form,
+.service-form-shell {
+    display: grid;
+    gap: 1rem;
+}
+
+.service-admin-card__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+}
+
+.service-status-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.service-status-chip--active {
+    background: rgba(88, 225, 208, 0.12);
+    color: var(--signal);
+}
+
+.service-status-chip--inactive {
+    background: rgba(240, 188, 103, 0.12);
+    color: var(--accent);
+}
+
+.service-admin-card__actions {
+    grid-template-columns: auto auto;
+    align-items: center;
+    justify-content: start;
+}
+
+.service-admin-card__actions form {
+    margin: 0;
+}
+
+.service-admin-card__actions .secondary-submit {
+    justify-self: start;
+}
+
+.admin-services-status {
+    border: 1px solid rgba(88, 225, 208, 0.32);
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    background: rgba(88, 225, 208, 0.08);
+    color: var(--text);
+}
+
+.service-admin-form {
+    margin-top: 1.35rem;
+}
+
 .lead-detail-card {
     margin-top: 1.25rem;
 }
@@ -782,7 +889,9 @@ blockquote {
     }
 
     .lead-meta,
-    .lead-card-header {
+    .lead-card-header,
+    .service-admin-card__header,
+    .service-admin-card__actions {
         grid-template-columns: 1fr;
     }
 

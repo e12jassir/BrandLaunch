@@ -1,10 +1,17 @@
 import os
+import re
 import sqlite3
 import subprocess
 from pathlib import Path
 
 from app import create_app
 from database.db import init_db
+
+
+def extract_csrf_token(body: str) -> str:
+    match = re.search(r'name="csrf_token" value="([^"]+)"', body)
+    assert match is not None
+    return match.group(1)
 
 
 def test_public_home_uses_service_business_metadata_and_shared_landmarks(client):
@@ -105,6 +112,13 @@ def test_admin_leads_route_requires_login_when_no_admin_session_exists(client):
     assert response.headers["Location"].endswith("/admin/login")
 
 
+def test_admin_services_route_requires_login_when_no_admin_session_exists(client):
+    response = client.get("/admin/services")
+
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/admin/login")
+
+
 def test_database_initialization_is_repeatable(tmp_path):
     database_path = tmp_path / "brandlaunch.sqlite"
     app = create_app({"TESTING": True, "DATABASE_PATH": str(database_path)})
@@ -124,6 +138,68 @@ def test_database_initialization_is_repeatable(tmp_path):
     assert {"leads", "services", "testimonials", "site_settings"}.issubset(
         table_names
     )
+
+
+def test_database_initialization_seeds_demo_services_once(tmp_path):
+    database_path = tmp_path / "brandlaunch-services-seed.sqlite"
+    app = create_app({"TESTING": True, "DATABASE_PATH": str(database_path)})
+
+    with app.app_context():
+        init_db(app)
+        init_db(app)
+
+    with sqlite3.connect(database_path) as connection:
+        services = connection.execute(
+            "SELECT title, description, starting_price, icon, is_active FROM services ORDER BY created_at ASC, id ASC"
+        ).fetchall()
+
+    assert services == [
+        (
+            "Offer Positioning Sprint",
+            "Sharpen the service promise, page structure, and primary CTA before the build starts.",
+            "From USD 600",
+            "OP",
+            1,
+        ),
+        (
+            "Premium Landing Build",
+            "Design and ship a polished landing page that makes the next step feel easier to take.",
+            "From USD 1400",
+            "LB",
+            1,
+        ),
+        (
+            "Conversion Refinement",
+            "Tighten copy, hierarchy, and contact flow after the first version is live.",
+            "From USD 900",
+            "CR",
+            1,
+        ),
+    ]
+
+
+def test_authenticated_admin_services_route_is_part_of_the_baseline(tmp_path):
+    app = create_app(
+        {
+            "TESTING": True,
+            "DATABASE_PATH": str(tmp_path / "brandlaunch-services-baseline.sqlite"),
+            "ADMIN_USERNAME": "nova-admin",
+            "ADMIN_PASSWORD": "super-secret",
+        }
+    )
+
+    with app.app_context():
+        init_db(app)
+
+    client = app.test_client()
+    csrf_token = extract_csrf_token(client.get("/admin/login").get_data(as_text=True))
+    client.post(
+        "/admin/login",
+        data={"username": "nova-admin", "password": "super-secret", "csrf_token": csrf_token},
+    )
+    response = client.get("/admin/services")
+
+    assert response.status_code == 200
 
 
 def test_pages_use_shared_layout_and_assets(client):

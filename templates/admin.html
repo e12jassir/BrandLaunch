@@ -14,9 +14,10 @@
     </div>
     <div class="admin-scope-note" aria-label="Admin scope note">
         <p class="hero-note-label">Scope now</p>
-        <p>Truthful lead metrics, recent triage, and a direct path into the full inbox.</p>
+        <p>Truthful lead metrics, recent triage, service management, and a direct path into the full inbox.</p>
         <div class="admin-actions">
             <a class="primary-action" href="{{ url_for('admin_leads') }}">Open inbox</a>
+            <a class="secondary-action" href="{{ url_for('admin_services') }}">Manage services</a>
             {% if summary.latest_lead_id %}
             <a class="secondary-action" href="{{ url_for('admin_lead_detail', lead_id=summary.latest_lead_id) }}">Open latest lead</a>
             {% else %}
@@ -24,6 +25,7 @@
             {% endif %}
         </div>
         <form method="post" action="{{ url_for('admin_logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <button type="submit" class="secondary-action">Log out</button>
         </form>
     </div>

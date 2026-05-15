@@ -1,8 +1,34 @@
 import re
+import sqlite3
 from pathlib import Path
+
+from app import create_app
+from database.db import init_db
 
 
 WHATSAPP_URL = "https://wa.me/15550000000?text=Hi%20Nova%20Studio%20Digital"
+
+
+def seed_service(
+    database_path,
+    *,
+    title,
+    description,
+    created_at,
+    starting_price=None,
+    icon=None,
+    is_active=1,
+):
+    with sqlite3.connect(database_path) as connection:
+        cursor = connection.execute(
+            """
+            INSERT INTO services (title, description, starting_price, icon, is_active, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (title, description, starting_price, icon, is_active, created_at),
+        )
+        connection.commit()
+        return int(cursor.lastrowid)
 
 
 def test_landing_sections_follow_the_marketing_flow(client):
@@ -180,3 +206,57 @@ def test_contact_section_keeps_ctas_below_single_column_content():
         "    margin-top: 1.35rem;\n"
         "}" in css
     )
+
+
+def test_landing_services_render_active_database_records_in_deterministic_order(tmp_path):
+    database_path = tmp_path / "brandlaunch-services.sqlite"
+    app = create_app({"TESTING": True, "DATABASE_PATH": str(database_path)})
+
+    with app.app_context():
+        init_db(app)
+
+    first_id = seed_service(
+        database_path,
+        title="Offer Positioning",
+        description="Clarify the promise before traffic or design gets heavier.",
+        starting_price="From USD 600",
+        icon="OP",
+        created_at="2026-05-13 08:00:00",
+    )
+    tied_first_id = seed_service(
+        database_path,
+        title="Landing Build",
+        description="Design and implementation for a premium service-business page.",
+        starting_price="From USD 1400",
+        icon="LB",
+        created_at="2026-05-13 09:00:00",
+    )
+    tied_second_id = seed_service(
+        database_path,
+        title="Inactive Audit",
+        description="This inactive record must stay off the public landing.",
+        starting_price="From USD 300",
+        icon="IA",
+        created_at="2026-05-13 09:00:00",
+        is_active=0,
+    )
+    later_id = seed_service(
+        database_path,
+        title="Conversion Refinement",
+        description="Improve contact clarity once the base landing is live.",
+        starting_price="From USD 900",
+        icon="CR",
+        created_at="2026-05-13 10:00:00",
+    )
+
+    body = app.test_client().get("/").get_data(as_text=True)
+
+    assert first_id < tied_first_id < tied_second_id < later_id
+    assert body.index("Offer Positioning") < body.index("Landing Build") < body.index(
+        "Conversion Refinement"
+    )
+    assert "Clarify the promise before traffic or design gets heavier." in body
+    assert "From USD 600" in body
+    assert "OP" in body
+    assert "Inactive Audit" not in body
+    assert "This inactive record must stay off the public landing." not in body

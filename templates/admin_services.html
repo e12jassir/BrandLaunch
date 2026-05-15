@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}BrandLaunch — Services{% endblock %}
+
+{% block content %}
+<section class="hero-panel admin-hero" aria-labelledby="admin-services-title">
+    <div>
+        <p class="eyebrow">Service management</p>
+        <h1 id="admin-services-title">Services</h1>
+        <p class="hero-copy">
+            Keep the landing offer compact: create, edit, and toggle the exact service cards the public page should show.
+            Delete flows, reordering, media, categories, and per-service pages remain deferred.
+        </p>
+    </div>
+    <div class="admin-scope-note" aria-label="Services management note">
+        <p class="hero-note-label">Controls now</p>
+        <p>Only the current service-card fields are editable so the surface stays focused and commercially usable.</p>
+        <div class="admin-actions">
+            <a class="primary-action" href="{{ url_for('admin_services_new') }}">Create service</a>
+            <a class="secondary-action" href="{{ url_for('admin') }}">Back to overview</a>
+        </div>
+    </div>
+</section>
+
+<section class="story-section admin-services-section" aria-labelledby="admin-services-list-title">
+    <div class="section-heading">
+        <p class="eyebrow">Landing order</p>
+        <h2 id="admin-services-list-title">Active and inactive cards in public display order</h2>
+    </div>
+
+    {% if status_message %}
+    <p class="admin-services-status" role="status">{{ status_message }}</p>
+    {% elif database_error %}
+    <p class="admin-services-status admin-services-status--error" role="alert">{{ database_error }}</p>
+    {% endif %}
+
+    <div class="service-admin-list" role="list">
+        {% for service in services %}
+        <article class="service-admin-card" role="listitem">
+            <div class="service-admin-card__header">
+                <div>
+                    <p class="lead-card-label">{{ service.starting_price or "Custom scope" }}</p>
+                    <h3>{{ service.title }}</h3>
+                </div>
+                <span class="service-status-chip {% if service.is_active %}service-status-chip--active{% else %}service-status-chip--inactive{% endif %}">
+                    {% if service.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+            </div>
+
+            <p class="service-admin-card__icon">{{ service.icon or "BL" }}</p>
+            <p class="service-admin-card__description">{{ service.description }}</p>
+
+            <div class="service-admin-card__actions">
+                <a class="secondary-action" href="{{ url_for('admin_services_edit', service_id=service.id) }}">Edit</a>
+                <form method="post" action="{{ url_for('admin_services_toggle', service_id=service.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="secondary-submit">{% if service.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<p>BrandLaunch services management: authenticated list, bounded create/edit, and active-state control only. Delete, ordering, media, and broader CMS workflows remain deferred.</p>
+{% endblock %}
